@@ -60,4 +60,9 @@ public class ProductoController {
     public List<Producto> obtenerPorCategoria(@PathVariable String categoria) {
         return productoRepository.findByCategoria(categoria);
     }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public List<Producto> obtenerPorUsuario(@PathVariable Long usuarioId) {
+        return productoRepository.findByUsuarioId(usuarioId);
+    }
 }

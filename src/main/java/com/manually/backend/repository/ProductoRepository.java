@@ -12,4 +12,5 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     List<Producto> findByDestacadoTrue();
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
     List<Producto> findByCategoria(String categoria);
+    List<Producto> findByUsuarioId(Long usuarioId);
 }
