@@ -30,9 +30,9 @@ public class ContenidoController {
     @Autowired private ComentarioRepository comentarioRepository;
     @Autowired private VideoRepository videoRepository;
     @Autowired private PiezaRepository piezaRepository;
-    @Autowired private ProductoRepository productoRepository; // Necesario para buscar el producto
+    @Autowired private ProductoRepository productoRepository; 
 
-    // --- RUTAS DE LECTURA (Las que ya tenías) ---
+    // --- RUTAS DE LECTURA ---
     @GetMapping("/comentarios/{productoId}")
     public List<Comentario> obtenerComentarios(@PathVariable Long productoId) {
         return comentarioRepository.findByProductoIdOrderByFechaPublicacionDesc(productoId);
@@ -48,13 +48,11 @@ public class ContenidoController {
         return piezaRepository.findByProductoId(productoId);
     }
 
-    // --- NUEVAS RUTAS DE ESCRITURA (Para guardar datos) ---
-    
+    // --- RUTAS DE ESCRITURA (Para guardar datos) ---
     @PostMapping("/comentarios/{productoId}")
     public Comentario crearComentario(@PathVariable Long productoId, @RequestBody Comentario nuevoComentario) {
         Producto producto = productoRepository.findById(productoId).orElseThrow();
         nuevoComentario.setProducto(producto);
-        // Como aún no tenemos el login real enlazado, el usuario será null (Anónimo)
         return comentarioRepository.save(nuevoComentario);
     }
 
@@ -78,27 +76,33 @@ public class ContenidoController {
         return comentarioRepository.findByUsuarioId(usuarioId);
     }
 
+    // ¡ESTAS DOS RUTAS FALTABAN! Son las que mandan los datos al panel admin
+    @GetMapping("/videos/usuario/{usuarioId}")
+    public List<Video> obtenerVideosDeUsuario(@PathVariable Long usuarioId) {
+        return videoRepository.findByUsuarioId(usuarioId);
+    }
+
+    @GetMapping("/piezas/usuario/{usuarioId}")
+    public List<Pieza> obtenerPiezasDeUsuario(@PathVariable Long usuarioId) {
+        return piezaRepository.findByUsuarioId(usuarioId);
+    }
+
+    // --- BORRADOS (Limpiados y mejorados) ---
     @DeleteMapping("/comentarios/{id}")
     public ResponseEntity<?> borrarComentario(@PathVariable Long id) {
         comentarioRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
-    // Ruta para borrar un video
     @DeleteMapping("/videos/{id}")
-    public org.springframework.http.ResponseEntity<?> borrarVideo(@PathVariable Long id) {
-        return videoRepository.findById(id).map(video -> {
-            videoRepository.delete(video);
-            return org.springframework.http.ResponseEntity.ok().build();
-        }).orElse(org.springframework.http.ResponseEntity.notFound().build());
+    public ResponseEntity<?> borrarVideo(@PathVariable Long id) {
+        videoRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
-    // Ruta para borrar una pieza
     @DeleteMapping("/piezas/{id}")
-    public org.springframework.http.ResponseEntity<?> borrarPieza(@PathVariable Long id) {
-        return piezaRepository.findById(id).map(pieza -> {
-            piezaRepository.delete(pieza);
-            return org.springframework.http.ResponseEntity.ok().build();
-        }).orElse(org.springframework.http.ResponseEntity.notFound().build());
+    public ResponseEntity<?> borrarPieza(@PathVariable Long id) {
+        piezaRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
